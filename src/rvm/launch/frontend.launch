@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>
+
+	<arg name="frame_rate" default="30.0"/>
+	<arg name="imgtopic" default="video/image_raw"/>
+
+	<include file="$(find rvm)/launch/camera.launch">
+		<arg name="camera_serial" value = "0"/>
+		<arg name="calibrated" value = "1"/>
+		<arg name="frame_rate" value="$(arg frame_rate)"/>
+		<arg name="camera_name" default = "video"/>
+	</include>
+
+	<node pkg="rvm" type="frontend_node" name="frontend_node" output="screen">
+		<param name="publish_video" value="true"/>
+		<param name="use_cv_imShow" value ="false"/>
+		<param name="camera_fps" value="$(arg frame_rate)"/>
+		<param name="use_webcam" value="false"/>
+		<param name="record_video" value="false"/>
+		<remap from="video" to="$(arg imgtopic)" />
+	</node>
+
+</launch>
