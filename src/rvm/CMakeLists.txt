@@ -4,6 +4,8 @@ project(rvm)
 ## Compile as C++11, supported in ROS Kinetic and newer
  add_compile_options(-std=c++11)
 
+ set(CMAKE_BUILD_TYPE Debug)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -143,7 +145,10 @@ include_directories(
 
 add_executable(frontend_node 
 	src/frontend.cpp 
-	src/node.cpp )
+	src/node.cpp 
+
+  src/feature_manager/feature_manager.cpp
+  src/feature_manager/lk_matcher.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

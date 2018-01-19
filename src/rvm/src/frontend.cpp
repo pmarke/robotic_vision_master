@@ -8,7 +8,7 @@ Frontend::Frontend()
 {
 	//create a private node handle for use with param server
 	ros::NodeHandle nh_private("~");
-
+	
 	// get parameters
 	nh_.param("publish_video", publish_video_, true);
 	nh_.param("use_cv_imShow", use_cv_imShow_, false);
@@ -20,13 +20,12 @@ Frontend::Frontend()
 	image_transport::ImageTransport it(nh_);
 	sub_video = it.subscribeCamera("video",10, &Frontend::callback_sub_video, this);
 	pub_video = it.advertise("altered_video",10);
-
 	/* Notes need to implement webcam and record video*/
 }
 
 
 void Frontend::callback_sub_video(const sensor_msgs::ImageConstPtr& data, const sensor_msgs::CameraInfoConstPtr& cinfo){
-
+	// printf("here \n");
 	// get newest image
 	try{
 		img_ = cv_bridge::toCvCopy(data,sensor_msgs::image_encodings::BGR8)->image;
@@ -57,6 +56,11 @@ void Frontend::callback_sub_video(const sensor_msgs::ImageConstPtr& data, const 
 	  cinfo_received_ = true;
 
 	}
+
+	cv::cvtColor(img_, grayImg_, cv::COLOR_BGR2GRAY);
+
+	// printf("here \n");
+	feature_manager_.find_correspoinding_features(grayImg_);
 
 	if(publish_video_) publish_video();
 	if(use_cv_imShow_) displayVideo_imShow();

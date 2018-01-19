@@ -1,65 +1,167 @@
-#include "lk_matcher"
+#include "feature_manager/lk_matcher.h"
 
-namespace robotic_vision{
+namespace robotic_vision {
 
 	LK_Matcher::LK_Matcher(){
 
 		ros::NodeHandle nh("~");
 
+		int feature_detector_type;
+
 		// get parameters
-		nh.param("gftt_maxCorners", gftt_parameters.maxCorners, 500);
-		nh.param("gftt_qualityLevel", gftt_parameters.qualityLevel, 0.05);
-		nh.param("gftt_minDistance", gftt_parameters.minDistance, 10);
-		nh.param("gftt_blockSize", gftt_parameters.blockSize, 9);
-		nh.param("gftt_useHarrisDetector", gftt_parameters.gftt_useHarrisDetector, true);
-		nh.param("gftt_k", gftt_parameters.k, 0.05);
+		nh.param<int>("gftt_maxCorners", gftt_parameters_.maxCorners, 500);
+		nh.param<double>("gftt_qualityLevel", gftt_parameters_.qualityLevel, 0.05);
+		nh.param<double>("gftt_minDistance", gftt_parameters_.minDistance, 10.0);
+		nh.param<int>("gftt_blockSize", gftt_parameters_.blockSize, 6);
+		nh.param<bool>("gftt_useHarrisDetector", gftt_parameters_.useHarrisDetector, true);
+		nh.param<double>("gftt_k", gftt_parameters_.k, 0.05);
 
-		nh.param("fast_threshold", fast_parameters.threshold,100 );
-		nh.param("fast_nonmaxSuppression", fast_parameters.nonmaxSuppression, true );
-		nh.param("fast_type", fast_parameters.type, cv::FastFeatureDetector::TYPE_9_16);
+		nh.param<int>("fast_threshold", fast_parameters_.threshold,100 );
+		nh.param<bool>("fast_nonmaxSuppression", fast_parameters_.nonmaxSuppression, true );
+		nh.param<int>("fast_type", fast_parameters_.type, cv::FastFeatureDetector::TYPE_9_16);
+		
+		nh.param<int>("LK_Feature_Detector_Type", feature_detector_type, (int)GFTT);
+		feature_detector_type_ = static_cast<enum LK_Feature_Detector_Type>(feature_detector_type);
 
-		nh.param("LK_Feature_Detector_Type", feature_detector_type_, GFTT);
+		nh.param("LK_OptFlow_maxLevel", lk_opticalFlow_parameters_.maxLevel,3);
+		nh.param("LK_OptFlow_flags",lk_opticalFlow_parameters_.flags,0);
+		nh.param("LK_OptFlow_minEigThreshold", lk_opticalFlow_parameters_.minEigThreshold,1e-4);
+		lk_opticalFlow_parameters_.pyramid_size = cv::Size(21,21);
+		lk_opticalFlow_parameters_.termCriteria = cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS,20,0.03);
 
 		// Create gftt object with given parameters
-		gftt.create(gftt_parameters.maxCorners,gftt_parameters.qualityLevel,gftt_parameters.minDistance,gftt_parameters.blockSize, gftt_parameters.gftt_useHarrisDetector,gftt_parameters.k);
+		gfttInit();
 	}
 
-	virtual void LK_Matcher::find_correspoinding_features(const cv::Mat& img, std::vector<cv::Point2f>& prev_features, std::vector<cv::Point2f>& new_matched, const cv::Mat& mask){
+	void LK_Matcher::find_correspoinding_features(const cv::Mat& img, std::vector<cv::Point2f>& prev_features, std::vector<cv::Point2f>& matched_features, const cv::Mat& mask){
 
-		// First Image
-		if(prev_features_ == NULL)
-		{
-			// Get features from the image
-			(feature_detector_type_ == GFTT) ? detect_features_GFTT(img, prev_features_) : detect_features_FAST(prev_features_);
+		// compute optical flow
+		std::vector<cv::Point2f> matched_features_temp;
+		optical_flow(img, matched_features_temp);
 
-			prev_image_ = img;
-		}
-		else // There has been at least one image processed
-		{
-			cv::calcOpticalFlowPyrLK(prev_image_, img, prev_features_, new_matched, status, err, cv::Size(21,21),3,0,0.0001);
-		}
+		// only keep the good matches
+		for(int i = 0; i < lk_opticalFlow_parameters_.status.size(); i++)
+			if(lk_opticalFlow_parameters_.status[i])
+			{
+				prev_features.push_back(prev_features_[i]);
+				matched_features.push_back(matched_features_temp[i]);
+			}
+
+		lk_display(img, prev_features, matched_features);
+		// clear history
+		prev_features_.clear();
+
+		// get features of the new image
+		detect_features(img, prev_features_);
+
+		// set the new image as the previous image
+		prev_image_ = img;
+
 	}
 
-	void LK_Matcher::detect_features_GFTT(const cv::Mat& img, std::vector<cv::Point2f>& features){
+	void LK_Matcher::detect_features(const cv::Mat& img, std::vector<cv::Point2f>& features){
+
+		// temporary vector to hold keypoints
+		std::vector<cv::KeyPoint> keypoints;
+
+		// Depending on the feature detector type, grab features from image
+		switch(feature_detector_type_){
+			case GFTT:
+			{
+				detect_features_GFTT(img, keypoints);
+				break;
+			}
+			case FAST:
+			{
+				detect_features_FAST(img, keypoints);
+				break;
+			}
+			default :
+			{
+				ROS_ERROR("LK_MATCHER: Feature Detector Type not found. \n");
+				break;
+			}
+		}
+
+		// convert features to 2d points points
+		for(int i = 0; i < keypoints.size(); i++)
+			features.push_back(keypoints[i].pt);
+
+	}
+
+	void LK_Matcher::detect_features_GFTT(const cv::Mat& img, std::vector<cv::KeyPoint>& keypoints){
 
 		//clear history
-		features.clear();
+		keypoints.clear();
 
 		// get the features
-		cv::detect(img,features);
+		gftt_->detect(img,keypoints);
 	}
 
 
-	void LK_Matcher::detect_features_FAST(const cv::Mat& img, std::vector<cv::Point2f>& features){
+	void LK_Matcher::detect_features_FAST(const cv::Mat& img, std::vector<cv::KeyPoint>& keypoints){
 
 		//clear history
-		features.clear();
+		keypoints.clear();
 
 		// get the features
-		cv::FAST(img,features,fast_parameters_.threshold, fast_parameters_.nonmaxSuppression, fast_parameters_.type);
+		cv::FAST(img,keypoints,fast_parameters_.threshold, fast_parameters_.nonmaxSuppression, fast_parameters_.type);
 	}
 
+	void LK_Matcher::optical_flow(const cv::Mat& img, std::vector<cv::Point2f>& new_matched){
 
+
+		// There has been at least two images
+		if(first_image_ != true)
+		{
+			// clear history
+			lk_opticalFlow_parameters_.status.clear();
+			lk_opticalFlow_parameters_.err.clear();
+
+			// The pyramids used in opticalFlow
+			std::vector<cv::Mat> current_pyramids;
+			cv::buildOpticalFlowPyramid(img, current_pyramids, lk_opticalFlow_parameters_.pyramid_size,lk_opticalFlow_parameters_.maxLevel);
+			cv::calcOpticalFlowPyrLK(prev_image_, 
+									 img, 
+									 prev_features_, 
+									 new_matched, 
+									 lk_opticalFlow_parameters_.status, 
+									 lk_opticalFlow_parameters_.err, 
+									 lk_opticalFlow_parameters_.pyramid_size,
+									 lk_opticalFlow_parameters_.maxLevel,
+									 lk_opticalFlow_parameters_.termCriteria,
+									 lk_opticalFlow_parameters_.flags,
+									 lk_opticalFlow_parameters_.minEigThreshold);
+	
+		}
+		else{
+			first_image_ = false;
+		}
+	}
+
+	void LK_Matcher::gfttInit(){
+
+		gftt_ = cv::GFTTDetector::create();
+
+		gftt_->setBlockSize(gftt_parameters_.blockSize);
+		gftt_->setHarrisDetector(gftt_parameters_.useHarrisDetector);
+		gftt_->setK(gftt_parameters_.k);
+		gftt_->setMaxFeatures(gftt_parameters_.maxCorners);
+		gftt_->setMinDistance(gftt_parameters_.minDistance);
+		gftt_->setQualityLevel(gftt_parameters_.qualityLevel);
+	}
+
+	void LK_Matcher::lk_display(const cv::Mat& img, std::vector<cv::Point2f>& prev_features, std::vector<cv::Point2f>& matched_features){
+
+		cv::Mat alteredImg = img.clone();
+		for(int i = 0; i < prev_features.size();i++)
+		{
+			
+			cv::line(alteredImg, prev_features[i], matched_features[i], cv::Scalar(255,0,0), 2);
+		}		
+		imshow("LK_Matcher: display",alteredImg);
+		cv::waitKey(1);
+	}
 
 
 }

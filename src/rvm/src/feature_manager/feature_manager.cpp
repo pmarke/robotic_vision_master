@@ -1,24 +1,24 @@
-#include "feature_manager.h"
+#include "feature_manager/feature_manager.h"
 
 namespace robotic_vision {
 
-	FeatureManager::FeatureManager();
+	FeatureManager::FeatureManager()
 	{
 
 		// Initialize feature matcher with default type.
-		set_matcher(OPTICAL_FLOW_PRY_LK);
+		set_matcher(OPTICAL_FLOW_PYR_LK);
 	}
 
 
 
 
-	void FeatureManager::find_correspoinding_features(cv::Mat& frame){
+	void FeatureManager::find_correspoinding_features(const cv::Mat& img){
 
 		// clear history
 		prev_features_.clear();
-		new_matched_.clear();
+		matched_features_.clear();
 
-		feature_matcher_->find_correspoinding_features(img, prev_features_, new_matched_);
+		feature_matcher_->find_correspoinding_features(img, prev_features_, matched_features_, mask_);
 	}
 
 
@@ -26,16 +26,13 @@ namespace robotic_vision {
 	void FeatureManager::set_matcher(enum FeatureMatcherType type){
 
 
-		// Create an instance of a private node handle
-		ros::NodeHandle nh("~");
-
 		if(type == OPTICAL_FLOW_PYR_LK)
 		{
 
 			//Retrieve the needed parameters for the cv::OpticalFlowPyrLK
-			get variables
-
-			feature_matcher_ = std::make_shared<LKMATCHER>();
+			//get variables
+			
+			feature_matcher_ = std::make_shared<LK_Matcher>();
 		}
 		else if(type == BF_MATCHER)
 		{

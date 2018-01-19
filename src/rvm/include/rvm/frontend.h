@@ -6,6 +6,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
+#include "feature_manager/feature_manager.h"
 #include <iostream>
 #include <vector>
 
@@ -41,6 +42,9 @@ namespace robotic_vision {
 
 		// frames
 		cv::Mat img_;
+		cv::Mat alteredImg_;
+		cv::Mat grayImg_;
+		cv::Mat hsvImg_;
 
 
 		// user options
@@ -49,6 +53,9 @@ namespace robotic_vision {
 		float camera_fps_;   // The fps of the camera. Not webcam
 		bool use_webcam_;    // If true, use webcam instead of ROS to get video
 		bool record_video_;  // If true, record altered vido
+
+		// extensions
+		FeatureManager feature_manager_;
 
 
 
