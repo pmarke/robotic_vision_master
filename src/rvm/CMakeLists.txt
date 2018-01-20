@@ -152,6 +152,7 @@ add_executable(frontend_node
 
   src/filter_manager/filter_manager.cpp
   src/filter_manager/filter_canny.cpp
+  src/filter_manager/filter_linear.cpp
   )
 
 ## Rename C++ executable without prefix

@@ -1,7 +1,10 @@
+#pragma once
+
 #include<ros/ros.h>
 #include<opencv2/opencv.hpp>
 #include"filter_manager/filter_base.h"
 #include"filter_manager/filter_canny.h"
+#include"filter_manager/filter_linear.h"
 #include<ros/console.h>
 #include<stdint.h>
 
@@ -14,7 +17,7 @@
 // Manages the filters so you can switch between different types.
 namespace robotic_vision {
 
-	enum Filter_Type{FILTER_CANNY};
+	enum Filter_Type{FILTER_CANNY, FILTER_LINEAR};
 
 	class FilterManager
 	{
