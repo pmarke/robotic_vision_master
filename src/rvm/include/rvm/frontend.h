@@ -33,7 +33,7 @@ namespace robotic_vision {
 		bool cinfo_received_ = false;  // camera info received once or no
 
 		// cv::VideoCapture
-		cv::VideoCapture cap();
+		cv::VideoCapture cap_;
 
 
 		// cv::VideoWriter
@@ -70,6 +70,12 @@ namespace robotic_vision {
 
 		// openCV imshow
 		void displayVideo_imShow();
+
+		// use webcam instead of ros subscribe to get video
+		void using_webcam();
+
+		// called to implement extensions such as FilterManager, FeatureManager, etc
+		void implementExtensions();
 
 
 

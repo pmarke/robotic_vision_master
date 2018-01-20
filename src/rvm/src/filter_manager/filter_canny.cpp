@@ -24,6 +24,7 @@ namespace robotic_vision {
 			canny_parameters.apertureSize, 
 			canny_parameters.L2gradient);
 
+
 	}
 
 	void FilterCanny::set_parameters(rvm::filterManagerConfig &config, uint32_t level){

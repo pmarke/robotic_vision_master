@@ -10,17 +10,25 @@ Frontend::Frontend()
 	ros::NodeHandle nh_private("~");
 	
 	// get parameters
-	nh_.param("publish_video", publish_video_, true);
-	nh_.param("use_cv_imShow", use_cv_imShow_, false);
-	nh_.param("camera_fps", camera_fps_, 30.0f);
-	nh_.param("use_webcam", use_webcam_, false);
-	nh_.param("record_video", record_video_,false);
+	nh_private.param("publish_video", publish_video_, true);
+	nh_private.param("use_cv_imShow", use_cv_imShow_, false);
+	nh_private.param("camera_fps", camera_fps_, 30.0f);
+	nh_private.param("use_webcam", use_webcam_, false);
+	nh_private.param("record_video", record_video_,false);
+
 
 	// ROS communication
 	image_transport::ImageTransport it(nh_);
-	sub_video = it.subscribeCamera("video",10, &Frontend::callback_sub_video, this);
 	pub_video = it.advertise("altered_video",10);
 	/* Notes need to implement webcam and record video*/
+
+
+	// use webcam else use ros subscriber to get image
+	if(use_webcam_)
+		using_webcam();
+	else{
+		sub_video = it.subscribeCamera("video",10, &Frontend::callback_sub_video, this);
+	}
 }
 
 
@@ -57,13 +65,7 @@ void Frontend::callback_sub_video(const sensor_msgs::ImageConstPtr& data, const 
 
 	}
 
-	cv::cvtColor(img_, grayImg_, cv::COLOR_BGR2GRAY);
-
-	filter_manager_.implement_filter(grayImg_,alteredImg_);
-	// feature_manager_.find_correspoinding_features(grayImg_);
-
-	if(publish_video_) publish_video();
-	if(use_cv_imShow_) displayVideo_imShow();
+	implementExtensions();
 
 
 }
@@ -81,6 +83,44 @@ void Frontend::displayVideo_imShow(){
 	// display the altered video using imShow
 	cv::imshow("altered_video", alteredImg_);
 	cv::waitKey(1);
+}
+
+void Frontend::using_webcam(){
+
+	// try to open the camera
+	if(!cap_.open(0))
+		ROS_WARN("Frontend: no webcam device found");
+
+	// Camera device found
+	else{
+
+		ROS_INFO("Frontend: webcam device found.\n");
+		// ROS_INFO("Press any key to terminate.\n");
+
+		// keep grabbing video from the webcam until the user presses a key
+		while(cv::waitKey(1) <=0 ){
+
+			// if there is a new image
+			if(cap_.read(img_))
+				implementExtensions();
+
+			ros::spinOnce();
+
+		}
+	}
+}
+
+void Frontend::implementExtensions(){
+
+	// convert color to gray
+	cv::cvtColor(img_, grayImg_, cv::COLOR_BGR2GRAY);
+
+	filter_manager_.implement_filter(grayImg_,alteredImg_);
+	// feature_manager_.find_correspoinding_features(grayImg_);
+
+	// user options
+	if(publish_video_) publish_video();
+	if(use_cv_imShow_) displayVideo_imShow();
 }
 
 
