@@ -5,6 +5,7 @@ namespace robotic_vision {
 	FeatureManager::FeatureManager()
 	{
 
+
 		// Initialize feature matcher with default type.
 		set_matcher(OPTICAL_FLOW_PYR_LK);
 	}

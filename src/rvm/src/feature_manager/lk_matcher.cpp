@@ -29,6 +29,7 @@ namespace robotic_vision {
 		lk_opticalFlow_parameters_.pyramid_size = cv::Size(21,21);
 		lk_opticalFlow_parameters_.termCriteria = cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS,20,0.03);
 
+		nh.param("LK_displayImg", displayImg, false);
 		// Create gftt object with given parameters
 		gfttInit();
 	}
@@ -47,7 +48,7 @@ namespace robotic_vision {
 				matched_features.push_back(matched_features_temp[i]);
 			}
 
-		lk_display(img, prev_features, matched_features);
+		if(displayImg) lk_display(img, prev_features, matched_features);
 		// clear history
 		prev_features_.clear();
 

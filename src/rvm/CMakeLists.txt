@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   image_transport
+  dynamic_reconfigure
 )
 
 find_package(OpenCV REQUIRED)
@@ -95,10 +96,9 @@ find_package(OpenCV REQUIRED)
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+generate_dynamic_reconfigure_options(
+  cfg/filter_manager.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -148,7 +148,11 @@ add_executable(frontend_node
 	src/node.cpp 
 
   src/feature_manager/feature_manager.cpp
-  src/feature_manager/lk_matcher.cpp)
+  src/feature_manager/lk_matcher.cpp
+
+  src/filter_manager/filter_manager.cpp
+  src/filter_manager/filter_canny.cpp
+  )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -159,6 +163,8 @@ add_executable(frontend_node
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_dependencies(frontend_node rvm_gencfg)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node

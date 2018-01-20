@@ -59,8 +59,8 @@ void Frontend::callback_sub_video(const sensor_msgs::ImageConstPtr& data, const 
 
 	cv::cvtColor(img_, grayImg_, cv::COLOR_BGR2GRAY);
 
-	// printf("here \n");
-	feature_manager_.find_correspoinding_features(grayImg_);
+	filter_manager_.implement_filter(grayImg_,alteredImg_);
+	// feature_manager_.find_correspoinding_features(grayImg_);
 
 	if(publish_video_) publish_video();
 	if(use_cv_imShow_) displayVideo_imShow();
@@ -71,7 +71,7 @@ void Frontend::callback_sub_video(const sensor_msgs::ImageConstPtr& data, const 
 void Frontend::publish_video(){
 	// publish the altered video
 	sensor_msgs::ImagePtr msg;
-	msg = cv_bridge::CvImage(std_msgs::Header(),sensor_msgs::image_encodings::BGR8, img_).toImageMsg();
+	msg = cv_bridge::CvImage(std_msgs::Header(),sensor_msgs::image_encodings::MONO8, alteredImg_).toImageMsg();
 	pub_video.publish(msg);
 
 }
@@ -79,7 +79,7 @@ void Frontend::publish_video(){
 void Frontend::displayVideo_imShow(){
 
 	// display the altered video using imShow
-	cv::imshow("altered_video", img_);
+	cv::imshow("altered_video", alteredImg_);
 	cv::waitKey(1);
 }
 

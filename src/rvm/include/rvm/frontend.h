@@ -7,6 +7,7 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 #include "feature_manager/feature_manager.h"
+#include "filter_manager/filter_manager.h"
 #include <iostream>
 #include <vector>
 
@@ -56,6 +57,7 @@ namespace robotic_vision {
 
 		// extensions
 		FeatureManager feature_manager_;
+		FilterManager filter_manager_;
 
 
 

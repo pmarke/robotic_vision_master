@@ -23,6 +23,8 @@ namespace robotic_vision {
 
 		cv::Mat prev_image_;
 
+		bool displayImg;
+
 
 		// gftt algorithm
 		cv::Ptr<cv::GFTTDetector> gftt_;
