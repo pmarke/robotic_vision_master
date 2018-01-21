@@ -16,9 +16,12 @@ namespace robotic_vision {
 
 	void FilterCanny::implement_filter(const cv::Mat& img, cv::Mat& filteredImg){
 
+		// canny filter needs a 1 channel image
+		cv::Mat grayImg = img.clone();
+		cv::cvtColor(img,grayImg, cv::COLOR_BGR2GRAY);
 
 		// implement canny filter
-		cv::Canny(img, filteredImg, 
+		cv::Canny(grayImg, filteredImg, 
 			canny_parameters.threshold_min, 
 			canny_parameters.threshold_max, 
 			canny_parameters.apertureSize, 

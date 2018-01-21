@@ -22,7 +22,13 @@ namespace robotic_vision {
 		
 		void set_parameters(rvm::filterManagerConfig &config, uint32_t level);
 
+		// return the type of filter;
+		int get_filter_type();
+
+		
+
 	private:
+
 
 		LinearFilter_Type linear_filter_type_ = BILATERAL;
 

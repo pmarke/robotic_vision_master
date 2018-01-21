@@ -29,4 +29,6 @@
 		<node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />
 	</group>
 
+ 	<node pkg="rqt_reconfigure" type="rqt_reconfigure" name="dynamic_reconfigure" />
+
 </launch>

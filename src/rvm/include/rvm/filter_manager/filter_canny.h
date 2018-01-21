@@ -16,6 +16,8 @@ namespace robotic_vision {
 
 		void set_parameters(rvm::filterManagerConfig &config, uint32_t level);
 
+		int get_filter_type(void){return 0;};
+
 	private:
 
 		struct CannyFilterParameters{

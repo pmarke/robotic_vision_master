@@ -8,6 +8,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include "feature_manager/feature_manager.h"
 #include "filter_manager/filter_manager.h"
+// #include "rvm/frontendConfig.h"
 #include <iostream>
 #include <vector>
 
@@ -24,6 +25,7 @@ namespace robotic_vision {
 		ros::NodeHandle nh_;
 		image_transport::CameraSubscriber sub_video;
 		image_transport::Publisher pub_video;
+
 
 
 		// camera parameters
@@ -59,8 +61,12 @@ namespace robotic_vision {
 		FeatureManager feature_manager_;
 		FilterManager filter_manager_;
 
-
-
+		// dynamic reconfigure
+		// dynamic_reconfigure::Server<rvm::frontendConfig> server_;
+		bool use_feature_manager_; // if true, use feature manager
+		bool use_filter_manager_;  // if true, use filter manager
+		bool display_features_;    // if true, features will be displayed
+		// void reconfigureCallback(rvm::frontendConfig &config, uint32_t level);
 
 		// sub_video callback
 		void callback_sub_video(const sensor_msgs::ImageConstPtr& data, const sensor_msgs::CameraInfoConstPtr& cinfo);
@@ -76,6 +82,9 @@ namespace robotic_vision {
 
 		// called to implement extensions such as FilterManager, FeatureManager, etc
 		void implementExtensions();
+
+		// draws the features onto the image.
+		void drawFeatures();
 
 
 

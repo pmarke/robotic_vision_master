@@ -13,7 +13,8 @@ namespace robotic_vision {
 
 
 
-	void FeatureManager::find_correspoinding_features(const cv::Mat& img){
+	void FeatureManager::find_correspoinding_features(const cv::Mat& img)
+	{
 
 		// clear history
 		prev_features_.clear();

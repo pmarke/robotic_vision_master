@@ -6,15 +6,22 @@ namespace robotic_vision {
 
 Frontend::Frontend()
 {
-	//create a private node handle for use with param server
-	ros::NodeHandle nh_private("~");
-	
+	// create private node
+	ros::NodeHandle nh_private("~/test");
+	// dynamic_reconfigure::Server<rvm::frontendConfig> server(nh_private);
+
 	// get parameters
 	nh_private.param("publish_video", publish_video_, true);
 	nh_private.param("use_cv_imShow", use_cv_imShow_, false);
 	nh_private.param("camera_fps", camera_fps_, 30.0f);
 	nh_private.param("use_webcam", use_webcam_, false);
 	nh_private.param("record_video", record_video_,false);
+
+	// dynamic reconfigure parameters
+	nh_private.param("use_feature_manager", use_feature_manager_, false);
+	nh_private.param("use_filter_manager", use_filter_manager_, false);
+	nh_private.param("display_features", display_features_, false);
+
 
 
 	// ROS communication
@@ -29,6 +36,10 @@ Frontend::Frontend()
 	else{
 		sub_video = it.subscribeCamera("video",10, &Frontend::callback_sub_video, this);
 	}
+
+	// dynamic reconfigure
+	// auto f = std::bind(&Frontend::reconfigureCallback, this, std::placeholders::_1, std::placeholders::_2);
+	// server.setCallback(f);
 }
 
 
@@ -71,9 +82,40 @@ void Frontend::callback_sub_video(const sensor_msgs::ImageConstPtr& data, const 
 }
 
 void Frontend::publish_video(){
+
+	std::string image_encoding;
+
+	// get the image encoding for cv_bridge depending on the CV:MAT type
+	switch(alteredImg_.type()){
+		case 0: // CV_8UC1
+		{
+			image_encoding = sensor_msgs::image_encodings::MONO8;
+			break;
+		}
+		case 16:// CV_8UC3
+		{
+			image_encoding = sensor_msgs::image_encodings::BGR8;
+
+			break;
+		}
+		case 24:
+		{
+			image_encoding = sensor_msgs::image_encodings::BGRA8;
+
+			break;
+		}
+		default:
+		{
+			image_encoding = sensor_msgs::image_encodings::MONO8;
+
+			ROS_WARN_ONCE("Frontend: image type not found. \n");
+			break;
+		}
+	}
+
 	// publish the altered video
 	sensor_msgs::ImagePtr msg;
-	msg = cv_bridge::CvImage(std_msgs::Header(),sensor_msgs::image_encodings::MONO8, alteredImg_).toImageMsg();
+	msg = cv_bridge::CvImage(std_msgs::Header(),image_encoding, alteredImg_).toImageMsg();
 	pub_video.publish(msg);
 
 }
@@ -112,17 +154,48 @@ void Frontend::using_webcam(){
 
 void Frontend::implementExtensions(){
 
-	// convert color to gray
-	cv::cvtColor(img_, grayImg_, cv::COLOR_BGR2GRAY);
 
-	filter_manager_.implement_filter(grayImg_,alteredImg_);
-	// feature_manager_.find_correspoinding_features(grayImg_);
+		filter_manager_.implement_filter(img_);
+		alteredImg_ = filter_manager_.filteredImg;
+
+
+		// convert color to gray
+		if( ((int) alteredImg_.type()) == 16)
+		{
+			cv::cvtColor(alteredImg_, grayImg_, cv::COLOR_BGR2GRAY);
+
+			feature_manager_.find_correspoinding_features(grayImg_);
+			drawFeatures();
+		}
+
+		
+
+
+	
 
 	// user options
 	if(publish_video_) publish_video();
 	if(use_cv_imShow_) displayVideo_imShow();
 }
 
+void Frontend::drawFeatures(){
+
+	// deep copy the image 
+	// alteredImg_ = img_.clone();
+
+	// add circles to the detected features
+	for( auto&& pt : feature_manager_.matched_features_){
+		cv::circle(alteredImg_,pt, 6, cv::Scalar(255,100,0), 2,0,0);
+	}
+	
+}
+
+// void Frontend::reconfigureCallback(rvm::frontendConfig &config, uint32_t level)
+// {
+// 	use_feature_manager_ = config.use_feature_manager;
+// 	use_filter_manager_ = config.use_filter_manager;
+// 	display_features_ = config.display_features;
+// }
 
 
 }

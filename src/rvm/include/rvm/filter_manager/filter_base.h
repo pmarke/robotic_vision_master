@@ -6,6 +6,7 @@
 
 namespace robotic_vision{
 
+
 	class FilterBase
 	{
 	public:
@@ -17,6 +18,8 @@ namespace robotic_vision{
 
 		// Used to update filter parameters
 		virtual void set_parameters(rvm::filterManagerConfig &config, uint32_t level)=0;
+	
+		virtual int get_filter_type() = 0;
 	};
 
 

@@ -24,13 +24,21 @@ namespace robotic_vision {
 	public:
 		FilterManager();
 
-		void implement_filter(const cv::Mat& img, cv::Mat& filteredImg);
+		void implement_filter(const cv::Mat& img);
 
 		// sets the filter to different ones
 		void set_filter(Filter_Type type);
 
+		cv::Mat filteredImg;
+
 
 	private:
+
+		// if true, gausian noise will be added to the image
+		bool add_gaussian_noise_ = false;
+
+		// if true, the filter name will be displayed on the altered image
+		bool display_filter_name_ = false;
 
 		// ensures that a filter has been selected before updating parameters
 		bool filterSet_ = false;
@@ -45,6 +53,13 @@ namespace robotic_vision {
 		std::shared_ptr<FilterBase> img_filter_;
 
 		void reconfigureCallback(rvm::filterManagerConfig &config, uint32_t level);
+
+
+		// draws the filter's name on the image
+		void drawFilterNameOnImage();
+
+		// add gaussian noise to the image
+		void add_gaussian_noise(cv::Mat& img);
 
 	};
 

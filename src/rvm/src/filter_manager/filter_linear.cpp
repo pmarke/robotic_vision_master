@@ -78,6 +78,11 @@ namespace robotic_vision {
 
 				// gaussian parameters
 				int ksize = config.gaussian_ksize;
+
+				// must be odd
+				if(ksize % 2 == 0)
+					ksize++;
+
 				gaussian_parameters_.ksize = cv::Size(ksize,ksize);
 				gaussian_parameters_.sigmaX = config.gaussian_sigmaX;
 				gaussian_parameters_.sigmaY = config.gaussian_sigmaY;
@@ -97,6 +102,11 @@ namespace robotic_vision {
 			}
 		}
 
+	}
+
+	int FilterLinear::get_filter_type()
+	{
+		return static_cast<int>(linear_filter_type_);
 	}
 
 	void FilterLinear::gaussian_filter(const cv::Mat& img, cv::Mat& filteredImg){
@@ -124,5 +134,6 @@ namespace robotic_vision {
 							 bilateral_parameters_.sigmaSpace,
 							 bilateral_parameters_.borderType);
 	}
+
 
 }

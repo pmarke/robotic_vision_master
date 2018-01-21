@@ -98,6 +98,7 @@ find_package(OpenCV REQUIRED)
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
   cfg/filter_manager.cfg
+  #cfg/frontend.cfg 
 )
 
 ###################################
