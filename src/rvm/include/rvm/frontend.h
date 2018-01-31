@@ -8,9 +8,13 @@
 #include <sensor_msgs/image_encodings.h>
 #include "feature_manager/feature_manager.h"
 #include "filter_manager/filter_manager.h"
+#include <ros_holodeck/command.h>
+#include <ros_holodeck/state.h>
 // #include "rvm/frontendConfig.h"
 #include <iostream>
 #include <vector>
+#include <Eigen/Dense>
+#include <stdlib.h> 
 
 
 namespace robotic_vision {
@@ -25,6 +29,14 @@ namespace robotic_vision {
 		ros::NodeHandle nh_;
 		image_transport::CameraSubscriber sub_video;
 		image_transport::Publisher pub_video;
+		image_transport::Subscriber sub_video_dos;
+		ros::Subscriber state_sub_;
+		ros::Publisher command_pub_;
+
+		// controller
+		ros_holodeck::state state_;
+		ros_holodeck::command command_;
+		float yaw_rate_ = 0;
 
 
 
@@ -66,10 +78,20 @@ namespace robotic_vision {
 		bool use_feature_manager_; // if true, use feature manager
 		bool use_filter_manager_;  // if true, use filter manager
 		bool display_features_;    // if true, features will be displayed
+		bool has_camera_info_;
 		// void reconfigureCallback(rvm::frontendConfig &config, uint32_t level);
 
-		// sub_video callback
+		// sub_video callback if camera info is provided
 		void callback_sub_video(const sensor_msgs::ImageConstPtr& data, const sensor_msgs::CameraInfoConstPtr& cinfo);
+
+		// video callback when no camera info is provided
+		void callback_sub_video_dos(const sensor_msgs::ImageConstPtr& data);
+
+		// get states from holodeck
+		void callback_state(const ros_holodeck::state& data);
+
+		// publish commands to holodeck
+		void publish_command();
 
 		// Publish Video
 		void publish_video();
@@ -86,7 +108,9 @@ namespace robotic_vision {
 		// draws the features onto the image.
 		void drawFeatures();
 
+		void calculate_FOE(cv::Point2f& pt);
 
+		void calculate_direction();
 
 		
 	};

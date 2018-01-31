@@ -20,7 +20,11 @@ namespace robotic_vision {
 		prev_features_.clear();
 		matched_features_.clear();
 
-		feature_matcher_->find_correspoinding_features(img, prev_features_, matched_features_, mask_);
+		feature_matcher_->find_correspoinding_features(img, prev_image_, prev_features_, matched_features_, mask_);
+	
+		calculate_pixel_velocity();
+
+		prev_image_ = img.clone();
 	}
 
 
@@ -43,6 +47,21 @@ namespace robotic_vision {
 
 		feature_matcher_type_ = type;
 	}
+
+
+	void FeatureManager::calculate_pixel_velocity() {
+
+		pixel_velocity_.clear();
+
+		for (int i = 0; i < prev_features_.size(); i++) {
+
+			pixel_velocity_.push_back(matched_features_[i]-prev_features_[i]);
+		
+		}
+
+
+	}
+
 
 
 }

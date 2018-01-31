@@ -3,18 +3,11 @@
 <launch>
 
 	<arg name="frame_rate" default="30.0"/>
-	<arg name="imgtopic" default="video/image_raw"/>
+	<arg name="imgtopic" default="/camera/image_raw"/>
 	<arg name="use_webcam" default="false"/>
 	<arg name="publish_video" default="true"/>
 
-	<group unless="$(arg use_webcam)">
-		<include file="$(find rvm)/launch/camera.launch">
-			<arg name="camera_serial" value = "0"/>
-			<arg name="calibrated" value = "1"/>
-			<arg name="frame_rate" value="$(arg frame_rate)"/>
-			<arg name="camera_name" default = "video"/>
-		</include>
-	</group>
+	<node pkg="rosbag" type="play" name="hall" args="--l -r 0.5 /home/mark/Downloads/hall.bag"/>
 
 	<node pkg="rvm" type="frontend_node" name="frontend_node" output="screen">
 		<param name="publish_video" value="$(arg publish_video)"/>
@@ -22,8 +15,8 @@
 		<param name="camera_fps" value="$(arg frame_rate)"/>
 		<param name="use_webcam" value="$(arg use_webcam)"/>
 		<param name="record_video" value="false"/>
-		<param name="has_camera_info" value = "true"/>
-		<remap from="video" to="$(arg imgtopic)" />
+		<param name="has_camera_info" value = "false"/>
+		<remap from="video/compressed" to="$(arg imgtopic)/compressed" />
 	</node>
 
 	<group if="$(arg publish_video)">

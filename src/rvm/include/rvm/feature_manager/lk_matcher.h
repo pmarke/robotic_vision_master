@@ -14,14 +14,14 @@ namespace robotic_vision {
 	public:
 		LK_Matcher();
 
-		void find_correspoinding_features(const cv::Mat& img, std::vector<cv::Point2f>& prev_features, std::vector<cv::Point2f>& matched_features, const cv::Mat& mask);
+		void find_correspoinding_features(const cv::Mat& img, const cv::Mat& prev_image, std::vector<cv::Point2f>& prev_features, std::vector<cv::Point2f>& matched_features, const cv::Mat& mask);
 
 	private:
 		std::vector<cv::Point2f> prev_features_;
 
 		LK_Feature_Detector_Type feature_detector_type_;
 
-		cv::Mat prev_image_;
+		
 
 		bool displayImg;
 
@@ -68,12 +68,10 @@ namespace robotic_vision {
 		void detect_features_FAST(const cv::Mat& img, std::vector<cv::KeyPoint>& keypoints);
 	
 		// implement optical flow
-		void optical_flow(const cv::Mat& img, std::vector<cv::Point2f>& next_features);
+		void optical_flow(const cv::Mat& img, const cv::Mat& prev_image, std::vector<cv::Point2f>& next_features);
 	
 		// initial the gftt with its parameters
 		void gfttInit();
 
-		// display stuff
-		void lk_display(const cv::Mat& img, std::vector<cv::Point2f>& prev_features, std::vector<cv::Point2f>& matched_features);
 	};
 }

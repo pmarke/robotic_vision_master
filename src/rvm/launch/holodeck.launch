@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<launch>
+
+
+	<node pkg="ros_holodeck" type="ros_holodeck_node" name ="ros_holodeck_node" output="screen"/>
+
+	<node pkg="rvm" type="frontend_node" name="frontend_node" output = "screen">
+		<param name="publish_video" value="true"/>
+		<param name="use_cv_imShow" value ="false"/>
+		<param name="camera_fps" value="false"/>
+		<param name="use_webcam" value="false"/>
+		<param name="record_video" value="false"/>
+		<param name="has_camera_info" value = "false"/>
+		<remap from="video" to="holodeck/image" />
+	</node>
+
+
+
+
+		<node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />
+		
+
+<!-- 	 	<node pkg="rqt_reconfigure" type="rqt_reconfigure" name="dynamic_reconfigure" /> -->
+
+
+
+
+</launch>

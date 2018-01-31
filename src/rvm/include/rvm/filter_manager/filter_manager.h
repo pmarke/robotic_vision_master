@@ -61,6 +61,8 @@ namespace robotic_vision {
 		// add gaussian noise to the image
 		void add_gaussian_noise(cv::Mat& img);
 
+	
+
 	};
 
 

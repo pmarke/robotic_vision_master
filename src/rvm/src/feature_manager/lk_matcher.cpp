@@ -9,11 +9,11 @@ namespace robotic_vision {
 		int feature_detector_type;
 
 		// get parameters
-		nh.param<int>("gftt_maxCorners", gftt_parameters_.maxCorners, 500);
-		nh.param<double>("gftt_qualityLevel", gftt_parameters_.qualityLevel, 0.05);
+		nh.param<int>("gftt_maxCorners", gftt_parameters_.maxCorners, 100);
+		nh.param<double>("gftt_qualityLevel", gftt_parameters_.qualityLevel, 0.03);
 		nh.param<double>("gftt_minDistance", gftt_parameters_.minDistance, 10.0);
 		nh.param<int>("gftt_blockSize", gftt_parameters_.blockSize, 6);
-		nh.param<bool>("gftt_useHarrisDetector", gftt_parameters_.useHarrisDetector, true);
+		nh.param<bool>("gftt_useHarrisDetector", gftt_parameters_.useHarrisDetector, false);
 		nh.param<double>("gftt_k", gftt_parameters_.k, 0.05);
 
 		nh.param<int>("fast_threshold", fast_parameters_.threshold,100 );
@@ -29,16 +29,15 @@ namespace robotic_vision {
 		lk_opticalFlow_parameters_.pyramid_size = cv::Size(21,21);
 		lk_opticalFlow_parameters_.termCriteria = cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS,20,0.03);
 
-		nh.param("LK_displayImg", displayImg, false);
 		// Create gftt object with given parameters
 		gfttInit();
 	}
 
-	void LK_Matcher::find_correspoinding_features(const cv::Mat& img, std::vector<cv::Point2f>& prev_features, std::vector<cv::Point2f>& matched_features, const cv::Mat& mask){
+	void LK_Matcher::find_correspoinding_features(const cv::Mat& img, const cv::Mat& prev_image, std::vector<cv::Point2f>& prev_features, std::vector<cv::Point2f>& matched_features, const cv::Mat& mask){
 
 		// compute optical flow
 		std::vector<cv::Point2f> matched_features_temp;
-		optical_flow(img, matched_features_temp);
+		optical_flow(img, prev_image, matched_features_temp);
 
 		// only keep the good matches
 		for(int i = 0; i < lk_opticalFlow_parameters_.status.size(); i++)
@@ -48,15 +47,14 @@ namespace robotic_vision {
 				matched_features.push_back(matched_features_temp[i]);
 			}
 
-		if(displayImg) lk_display(img, prev_features, matched_features);
+		
 		// clear history
 		prev_features_.clear();
 
 		// get features of the new image
 		detect_features(img, prev_features_);
 
-		// set the new image as the previous image
-		prev_image_ = img;
+		
 
 	}
 
@@ -109,7 +107,7 @@ namespace robotic_vision {
 		cv::FAST(img,keypoints,fast_parameters_.threshold, fast_parameters_.nonmaxSuppression, fast_parameters_.type);
 	}
 
-	void LK_Matcher::optical_flow(const cv::Mat& img, std::vector<cv::Point2f>& new_matched){
+	void LK_Matcher::optical_flow(const cv::Mat& img, const cv::Mat& prev_image, std::vector<cv::Point2f>& next_features){
 
 
 		// There has been at least two images
@@ -122,10 +120,10 @@ namespace robotic_vision {
 			// The pyramids used in opticalFlow
 			std::vector<cv::Mat> current_pyramids;
 			cv::buildOpticalFlowPyramid(img, current_pyramids, lk_opticalFlow_parameters_.pyramid_size,lk_opticalFlow_parameters_.maxLevel);
-			cv::calcOpticalFlowPyrLK(prev_image_, 
+			cv::calcOpticalFlowPyrLK(prev_image, 
 									 img, 
 									 prev_features_, 
-									 new_matched, 
+									 next_features, 
 									 lk_opticalFlow_parameters_.status, 
 									 lk_opticalFlow_parameters_.err, 
 									 lk_opticalFlow_parameters_.pyramid_size,
@@ -134,6 +132,7 @@ namespace robotic_vision {
 									 lk_opticalFlow_parameters_.flags,
 									 lk_opticalFlow_parameters_.minEigThreshold);
 	
+
 		}
 		else{
 			first_image_ = false;
@@ -152,17 +151,6 @@ namespace robotic_vision {
 		gftt_->setQualityLevel(gftt_parameters_.qualityLevel);
 	}
 
-	void LK_Matcher::lk_display(const cv::Mat& img, std::vector<cv::Point2f>& prev_features, std::vector<cv::Point2f>& matched_features){
-
-		cv::Mat alteredImg = img.clone();
-		for(int i = 0; i < prev_features.size();i++)
-		{
-			
-			cv::line(alteredImg, prev_features[i], matched_features[i], cv::Scalar(255,0,0), 2);
-		}		
-		imshow("LK_Matcher: display",alteredImg);
-		cv::waitKey(1);
-	}
 
 
 }

@@ -8,6 +8,8 @@
 #include <memory>
 
 
+
+
 // Available Feature Matchers/Trackers
 
 
@@ -27,11 +29,14 @@ public:
 
 	std::vector<cv::Point2f> prev_features_;    // Features obtained by a feature detection method on old frame
 	std::vector<cv::Point2f> matched_features_; // Corresponding features on new frame
+	std::vector<cv::Point2f> pixel_velocity_;   // pixel velocity between prev frame and new frame
+
 
 	// This method finds the corresponding features in the new frame
 	// That were found the in previous frame.
 	void find_correspoinding_features(const cv::Mat& img);
 
+	cv::Mat prev_image_;
 
 	cv::Mat mask_;
 
@@ -44,6 +49,9 @@ private:
 
 
 	void set_matcher(enum FeatureMatcherType type);
+
+	// calculates pixel velocity between frames of the detected features.
+	void calculate_pixel_velocity();
 
 
 };
