@@ -230,9 +230,9 @@ void Frontend::drawFeatures(){
 
 	cv::Point2f pt;
 
-	// calculate_FOE(pt);
+	calculate_FOE(pt);
 
-	// cv::circle(alteredImg_, pt, 5, cv::Scalar(0,0,255),4);
+	cv::circle(alteredImg_, pt, 5, cv::Scalar(0,0,255),4);
 
 
 
@@ -242,15 +242,15 @@ void Frontend::drawFeatures(){
 
 void Frontend::calculate_FOE(cv::Point2f& pt) {
 
-	Eigen::Matrix<float, 50,2> m;
-	Eigen::Matrix<float,50,1> b;
+	Eigen::Matrix<float, 10,2> m;
+	Eigen::Matrix<float,10,1> b;
 	Eigen::Matrix<float,2,1> result;
 
 
 
-	if (feature_manager_.pixel_velocity_.size() >= 50) {
+	if (feature_manager_.pixel_velocity_.size() >= 10) {
 
-		for (int i = 0; i < feature_manager_.prev_features_.size() && i < 50; i++) {
+		for (int i = 0; i < feature_manager_.prev_features_.size() && i < 10; i++) {
 
 			m(i,0) = feature_manager_.pixel_velocity_[i].y;
 
@@ -275,7 +275,7 @@ void Frontend::calculate_FOE(cv::Point2f& pt) {
 		pt.y = 0;
 	}
 
-	std::cout << pt.x << " " << pt.y << std::endl;
+	// std::cout << pt.x << " " << pt.y << std::endl;
 
 
 }
@@ -301,18 +301,18 @@ void Frontend::calculate_direction() {
 	sum = sum/feature_manager_.pixel_velocity_.size();
 	avg_mag = avg_mag/feature_manager_.pixel_velocity_.size();
 
-	std::cout << "sum " << sum << std::endl;
-	std::cout << "avg_mag " << avg_mag << std::endl;
+	// std::cout << "sum " << sum << std::endl;
+	// std::cout << "avg_mag " << avg_mag << std::endl;
 
 	// low pass filter
-	if (avg_mag > 4) {
-		command_.pitch = 0;
-		command_.roll = 0.1;
+	if (avg_mag > 10) {
+		command_.pitch = 0.1;
+		command_.roll = 0;
 		command_.yaw_rate = 0;
 		command_.altitude = -5;
 	}
-	else if (avg_mag > 2) {
-		yaw_rate_ = 0.8*yaw_rate_ + 0.2*sum*scale;
+	else if (avg_mag > 0.5) {
+		yaw_rate_ = 0.5*yaw_rate_ + 0.5*sum*scale;
 
 		if (yaw_rate_ > 1)
 			yaw_rate_ = 1;
@@ -321,16 +321,17 @@ void Frontend::calculate_direction() {
 
 		command_.pitch = -0.1;
 		command_.roll = 0;
-		command_.yaw_rate = yaw_rate_;
+		command_.yaw_rate = -yaw_rate_;
 		command_.altitude = -5;
 	}
 	else {
-		command_.pitch = -0.3;
+		command_.pitch = -0.1;
 		command_.roll = 0;
 		command_.yaw_rate = 0;
 		command_.altitude = -5;
 	}
 
+	std::cout << "yaw_rate " << command_.yaw_rate << std::endl;
 
 
 

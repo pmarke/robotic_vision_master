@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<launch>
+
+	<arg name="imgtopic" default="/camera_sim/image_raw"/>
+	<arg name="use_webcam" default="false"/>
+	<arg name="publish_video" default="true"/>
+	<arg name="image_transport_hint" default="compressed"/>
+
+	<node pkg="rosbag" type="play" name="campus" args="--l  /home/mark/rosBags/campus.bag"/>
+
+	<node pkg="target_tracking" type="target_tracking_frontend_node" name="target_tracking_frontend_node" output="screen">
+		<param name="publish_video" value="$(arg publish_video)"/>
+		<param name="use_webcam" value="$(arg use_webcam)"/>
+		<param name="has_camera_info" value = "false"/>
+		<param name="image_transport_hint" value="$(arg image_transport_hint)"/>
+		<remap from="video" to="$(arg imgtopic)" />
+		
+	</node>
+
+	<group if="$(arg publish_video)">
+		<node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />
+	</group>
+
+
+</launch>

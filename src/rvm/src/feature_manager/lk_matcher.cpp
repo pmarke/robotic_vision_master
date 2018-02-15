@@ -10,8 +10,8 @@ namespace robotic_vision {
 
 		// get parameters
 		nh.param<int>("gftt_maxCorners", gftt_parameters_.maxCorners, 100);
-		nh.param<double>("gftt_qualityLevel", gftt_parameters_.qualityLevel, 0.03);
-		nh.param<double>("gftt_minDistance", gftt_parameters_.minDistance, 10.0);
+		nh.param<double>("gftt_qualityLevel", gftt_parameters_.qualityLevel, 0.05);
+		nh.param<double>("gftt_minDistance", gftt_parameters_.minDistance, 50.0);
 		nh.param<int>("gftt_blockSize", gftt_parameters_.blockSize, 6);
 		nh.param<bool>("gftt_useHarrisDetector", gftt_parameters_.useHarrisDetector, false);
 		nh.param<double>("gftt_k", gftt_parameters_.k, 0.05);
