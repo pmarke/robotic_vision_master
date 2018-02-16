@@ -38,6 +38,9 @@ Frontend::Frontend()
 		}
 	}
 
+	img_count_ = 0;
+	img_use_=4;
+
 }
 
 void Frontend::callback_sub_video_dos(const sensor_msgs::ImageConstPtr& data) {
@@ -160,11 +163,39 @@ void Frontend::using_webcam(){
 
 void Frontend::implementExtensions(){
 
-	// unidistort the image
-	if (cinfo_received_) 
-		cv::undistort(img_, img_, camera_matrix_,dist_coeff_);
+	if (img_count_++ % img_use_ == 0) {
+		// unidistort the image
+		if (cinfo_received_) 
+			cv::undistort(img_, img_, camera_matrix_,dist_coeff_);
 
-	img_diff_tracker_.get_features(img_);
+		// convert image to grayscale
+		cv::cvtColor(img_, grayImg_, cv::COLOR_BGR2GRAY);
+
+
+		// Use feature manager to find moving features and
+		// to compute the homography between images
+		feature_manager_.find_correspoinding_features(grayImg_);
+
+
+
+
+		// The new image in the coordinate frame of the old image
+		cv::Mat warpImg; 
+
+		// Convert the new image into the fame of the old image
+		if (!feature_manager_.homography_.empty())
+			cv::warpPerspective(grayImg_, warpImg, feature_manager_.homography_, grayImg_.size());
+		else
+			warpImg = grayImg_.clone();
+
+		// std::cout << " gray image size: " << grayImg_.size() << std::endl;
+		// std::cout << " warp img size: " << warpImg.size() << std::endl;
+
+
+		// Use diff tracker to get features that are moving
+		img_diff_tracker_.get_features(grayImg_);
+	}
+
 
 
 

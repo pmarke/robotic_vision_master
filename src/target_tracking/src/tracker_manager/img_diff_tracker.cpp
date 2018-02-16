@@ -4,6 +4,12 @@ namespace robotic_vision {
 
 ImgDiffTracker::ImgDiffTracker() {
 
+
+	display_ = true;
+	cv::namedWindow("Difference Image", CV_WINDOW_NORMAL);
+	cv::resizeWindow("Difference Image", 600, 400);
+
+
 	first_image_ = true;
 
 	// Set up blob detector
@@ -41,7 +47,7 @@ ImgDiffTracker::ImgDiffTracker() {
 void ImgDiffTracker::get_features(const cv::Mat img) {
 
 	// convert image to grayscale
-	cv::cvtColor(img, gray_image_, cv::COLOR_BGR2GRAY);
+	gray_image_ = img.clone();
 
 	// smooth the image
 	// cv::medianBlur(gray_image_, gray_image_, 7);
@@ -79,7 +85,8 @@ void ImgDiffTracker::get_features(const cv::Mat img) {
 		background_image_ = gray_image_.clone();
 
 		// Display the image
-		display_image();
+		if (display_)
+			display_image();
 
 
 	}

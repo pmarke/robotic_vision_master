@@ -16,6 +16,7 @@ namespace robotic_vision {
 
 		// Keeps track if at least one image has been received. 
 		bool first_image_;
+		bool display_;
 
 		// Different images
 		cv::Mat gray_image_;

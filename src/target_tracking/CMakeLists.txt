@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(rransac REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -128,6 +129,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
+  ${RRANSAC_INCLUDE_DIRS}
 
 )
 
@@ -152,6 +154,10 @@ add_executable(${PROJECT_NAME}_frontend_node
 
   src/tracker_manager/img_diff_tracker.cpp
 
+  src/feature_manager/feature_manager.cpp
+  src/feature_manager/orb_matcher.cpp
+  src/feature_manager/lk_matcher.cpp
+
 
   )
 
@@ -170,7 +176,10 @@ add_executable(${PROJECT_NAME}_frontend_node
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(${PROJECT_NAME}_frontend_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_frontend_node 
+	${catkin_LIBRARIES} 
+	${OpenCV_LIBRARIES} 
+	${RRANSAC_LIBS})
 
 #############
 ## Install ##
