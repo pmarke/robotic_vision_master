@@ -21,6 +21,7 @@
 // Extensions
 #include "tracker_manager/img_diff_tracker.h"
 #include "feature_manager/feature_manager.h"
+#include "rransac/tt_rransac.h"
 
 
 namespace robotic_vision {
@@ -65,6 +66,7 @@ namespace robotic_vision {
 		// extensions
 		ImgDiffTracker img_diff_tracker_;
 		FeatureManager feature_manager_;
+		TTRRansac tt_rransac_;
 
 		// Used to indicate how many images to throw away
 		unsigned img_count_;

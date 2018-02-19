@@ -158,6 +158,8 @@ add_executable(${PROJECT_NAME}_frontend_node
   src/feature_manager/orb_matcher.cpp
   src/feature_manager/lk_matcher.cpp
 
+  src/rransac/tt_rransac.cpp
+
 
   )
 

@@ -55,9 +55,6 @@ namespace robotic_vision {
 		
 		}
 
-		// if (pixel_velocity_.size() > 0)
-		// 	std::cout << pixel_velocity_[0] << std::endl;
-
 
 	}
 
@@ -68,7 +65,6 @@ namespace robotic_vision {
 
 			homography_ = cv::findHomography(prev_features_, matched_features_, cv::RANSAC);
 
-			// std::cout << homography_ << std::endl;
 		}
 
 
@@ -143,7 +139,7 @@ namespace robotic_vision {
 			if (norm_pixel_velocities[i] > (mean + stdd*k_)) {
 
 				moving_features_.push_back(matched_features_[index[i]]);
-				moving_velocity_.push_back(pixel_velocity_[index[i]]);
+				moving_velocity_.push_back(pixel_velocity_[index[i]]*frame_rate_);
 
 			}
 

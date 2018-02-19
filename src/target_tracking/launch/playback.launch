@@ -18,9 +18,9 @@
 		
 	</node>
 
-	<group if="$(arg publish_video)">
+<!-- 	<group if="$(arg publish_video)">
 		<node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />
-	</group>
+	</group> -->
 
 
 </launch>

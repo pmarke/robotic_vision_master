@@ -18,6 +18,8 @@ public:
 	std::vector<cv::Point2f> matched_features_; // Corresponding features on new frame
 	std::vector<cv::Point2f> pixel_velocity_;   // pixel velocity between prev frame and new frame
 
+	std::vector<cv::Point2f> moving_features_;    // Features that are moving
+	std::vector<cv::Point2f> moving_velocity_;    // The velocity of the features that are moving
 
 
 	// This method finds the corresponding features in the new frame
@@ -37,8 +39,8 @@ private:
 	float mean_;
 	float stdd_;
 	float k_;  
-	std::vector<cv::Point2f> moving_features_;    // Features that are moving
-	std::vector<cv::Point2f> moving_velocity_;    // The velocity of the features that are moving
+
+	float frame_rate_ = 5.0/30;
 
 	bool display_;
 
