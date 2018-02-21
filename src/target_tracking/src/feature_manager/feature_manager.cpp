@@ -5,17 +5,23 @@ namespace robotic_vision {
 	FeatureManager::FeatureManager()
 	{
 
-		k_ = 1.1;
+		k_ = 1.0;
 
 		base_feature_matcher_ = std::make_shared<LK_Matcher>();
 
 		// Used for display
 		display_ = true;
-		cv::namedWindow("Moving Features", CV_WINDOW_NORMAL);
-		cv::resizeWindow("Moving Features", 600, 400);
+		if (display_) {
+			cv::namedWindow("Moving Features", CV_WINDOW_NORMAL);
+			cv::resizeWindow("Moving Features", 1680/3, 1050/3);
+			cv::moveWindow("Moving Features",        0, 2*1050/3);
 
-		cv::namedWindow("Optical Flow", CV_WINDOW_NORMAL);
-		cv::resizeWindow("Optical Flow", 600, 400);
+			cv::namedWindow("Optical Flow", CV_WINDOW_NORMAL);
+			cv::resizeWindow("Optical Flow", 1680/3, 1050/3);
+			cv::moveWindow("Optical Flow",        0, 1050/3);
+
+		}
+		
 
 	}
 

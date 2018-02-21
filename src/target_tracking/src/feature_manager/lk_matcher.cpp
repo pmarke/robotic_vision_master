@@ -32,7 +32,9 @@ namespace robotic_vision {
 		// Used for display
 		display_ = true;
 		cv::namedWindow("LK_Matches", CV_WINDOW_NORMAL);
-		cv::resizeWindow("LK_Matches", 600, 400);
+		cv::resizeWindow("LK_Matches", 1680/3, 1050/3);
+		cv::moveWindow("Optical Flow", 0, 0);
+
 
 		// Create gftt object with given parameters
 		gfttInit();

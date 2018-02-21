@@ -2,6 +2,7 @@
 
 #include <rransac/tracker.h>
 #include <rransac/access_type.h>
+#include <rransac/tracks.h>
 
 #include <vector>
 
@@ -18,6 +19,10 @@ namespace robotic_vision {
 	class TTRRansac {
 
 	public:
+
+
+		std::vector<Tracks> tracks_;
+
 
 		TTRRansac();
 
@@ -49,22 +54,6 @@ namespace robotic_vision {
 		std::vector<cv::Scalar> colors_;
 	 	double text_scale_;	
 
-		struct Tracks {
-
-			int id;
-			float inlier_ratio;
-
-			// position
-			float x;
-			float y;
-
-			// velocity
-			float vx;
-			float vy;
-
-		};
-
-		std::vector<Tracks> tracks_;
 
 
 

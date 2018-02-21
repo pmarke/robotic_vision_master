@@ -195,14 +195,24 @@ void Frontend::implementExtensions(){
 		// Use diff tracker to get features that are moving
 		img_diff_tracker_.get_features(grayImg_);
 
-		// if (feature_manager_.moving_features_.size() > 0) {
+		// Use camshift tracker to get features
+		meanshift_tracker_.get_features(img_, tt_rransac_.tracks_);
+
+		if (feature_manager_.moving_features_.size() > 0) {
 
 
-		// 	tt_rransac_.add_measurments(feature_manager_.moving_features_, feature_manager_.moving_velocity_,0);
-		// 	tt_rransac_.run_tracker();
-		// 	// tt_rransac_.draw_tracks(img_);
+			tt_rransac_.add_measurments(feature_manager_.moving_features_, feature_manager_.moving_velocity_,0);
+			tt_rransac_.add_measurments(img_diff_tracker_.new_features_,1);
+			tt_rransac_.add_measurments(meanshift_tracker_.new_features_,2);
+			tt_rransac_.run_tracker();
+			tt_rransac_.draw_tracks(img_);
 
-		// }
+		}
+
+		// Init camshift tracker targets
+		meanshift_tracker_.init_targets(img_,tt_rransac_.tracks_);
+
+
 	}
 
 

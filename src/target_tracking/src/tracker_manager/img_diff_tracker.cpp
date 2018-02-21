@@ -7,7 +7,9 @@ ImgDiffTracker::ImgDiffTracker() {
 
 	display_ = true;
 	cv::namedWindow("Difference Image", CV_WINDOW_NORMAL);
-	cv::resizeWindow("Difference Image", 600, 400);
+	cv::resizeWindow("Difference Image", 1680/3, 1050/3);
+    cv::moveWindow("Difference Image",   2*1680/3, 0);
+
 
 
 	first_image_ = true;
@@ -23,8 +25,8 @@ ImgDiffTracker::ImgDiffTracker() {
 	params_.blobColor = 255;
 	 
 	// Filter by Area.
-	params_.filterByArea = false;
-	params_.minArea = 1500;
+	params_.filterByArea = true;
+	params_.minArea = 100;
 	 
 	// Filter by Circularity
 	params_.filterByCircularity = false;
@@ -80,6 +82,11 @@ void ImgDiffTracker::get_features(const cv::Mat img) {
 
 		// detect key points
 		detector_->detect(diff_image_,keypoints_);
+
+		// Clean history and Extract features from key points
+		new_features_.clear();
+		cv::KeyPoint::convert(keypoints_,new_features_);
+
 
 		// UPdate background_image
 		background_image_ = gray_image_.clone();

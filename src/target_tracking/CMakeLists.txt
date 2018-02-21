@@ -153,6 +153,7 @@ add_executable(${PROJECT_NAME}_frontend_node
 	src/node.cpp 
 
   src/tracker_manager/img_diff_tracker.cpp
+  src/tracker_manager/meanshift_tracker.cpp
 
   src/feature_manager/feature_manager.cpp
   src/feature_manager/orb_matcher.cpp

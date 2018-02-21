@@ -12,6 +12,9 @@ namespace robotic_vision {
 
 		void get_features(const cv::Mat img);
 
+		// new features
+		std::vector<cv::Point2f> new_features_;
+
 	private:
 
 		// Keeps track if at least one image has been received. 
@@ -27,6 +30,7 @@ namespace robotic_vision {
 		cv::SimpleBlobDetector::Params params_;
 		cv::Ptr<cv::SimpleBlobDetector> detector_;
 		std::vector<cv::KeyPoint> keypoints_;
+
 
 
 		void display_image();
