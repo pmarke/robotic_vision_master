@@ -1,31 +1,21 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(target_tracking)
+project(play_ground)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
- add_compile_options(-std=c++11)
-
-
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  sensor_msgs
-  cv_bridge
-  roscpp
-  std_msgs
-  image_transport
 )
-
-find_package(OpenCV REQUIRED)
-find_package(Eigen3 REQUIRED)
-# find_package(rransac REQUIRED)
-find_package(rransac 1.0.4 EXACT REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+find_package(OpenCV REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -99,8 +89,8 @@ find_package(rransac 1.0.4 EXACT REQUIRED)
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 # generate_dynamic_reconfigure_options(
-#   cfg/filter_manager.cfg
-#   #cfg/frontend.cfg 
+#   cfg/DynReconf1.cfg
+#   cfg/DynReconf2.cfg
 # )
 
 ###################################
@@ -114,8 +104,8 @@ find_package(rransac 1.0.4 EXACT REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES rvm
-  CATKIN_DEPENDS cv_bridge
+#  LIBRARIES play_ground
+#  CATKIN_DEPENDS roscpp
 #  DEPENDS system_lib
 )
 
@@ -126,17 +116,25 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include/target_tracking
+include/play_ground
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
-  ${RRANSAC_INCLUDE_DIRS}
 
 )
 
+add_executable(play_ground_node
+	src/node.cpp
+	src/frontend.cpp
+
+	src/feature_manager/feature_manager.cpp 
+	src/feature_manager/lk_matcher.cpp)
+
+target_link_libraries(play_ground_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/rvm.cpp
+#   src/${PROJECT_NAME}/play_ground.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -147,23 +145,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/rvm_node.cpp)
-
-add_executable(${PROJECT_NAME}_frontend_node 
-	src/frontend.cpp 
-	src/node.cpp 
-
-  src/tracker_manager/img_diff_tracker.cpp
-  src/tracker_manager/meanshift_tracker.cpp
-
-  src/feature_manager/feature_manager.cpp
-  src/feature_manager/orb_matcher.cpp
-  src/feature_manager/lk_matcher.cpp
-
-  src/rransac/tt_rransac.cpp
-
-
-  )
+# add_executable(${PROJECT_NAME}_node src/play_ground_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -175,15 +157,10 @@ add_executable(${PROJECT_NAME}_frontend_node
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(${PROJECT_NAME}_frontend_node 
-	${catkin_LIBRARIES} 
-	${OpenCV_LIBRARIES} 
-	${RRANSAC_LIBS})
 
 #############
 ## Install ##
@@ -225,11 +202,10 @@ target_link_libraries(${PROJECT_NAME}_frontend_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_rvm.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_play_ground.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-
